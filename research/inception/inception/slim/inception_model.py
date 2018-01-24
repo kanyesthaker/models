@@ -253,9 +253,11 @@ def inception_v3(inputs,
           aux_logits = ops.conv2d(aux_logits, 128, [1, 1], scope='proj')
           # Shape of feature map before the final layer.
           shape = aux_logits.get_shape()
+          print('SHAPE: {}'.format(shape))
           aux_logits = ops.conv2d(aux_logits, 768, shape[1:3], stddev=0.01,
                                   padding='VALID')
           aux_logits = ops.flatten(aux_logits)
+          print('AUX LOGITS: {}'.format(aux_logits))
           aux_logits = ops.fc(aux_logits, num_classes, activation=None,
                               stddev=0.001, restore=restore_logits)
           end_points['aux_logits'] = aux_logits
@@ -317,6 +319,7 @@ def inception_v3(inputs,
         # Final pooling and prediction
         with tf.variable_scope('logits'):
           shape = net.get_shape()
+          print('SHAPE BEFORE DROPOUT: {}'.format(shape))
           net = ops.avg_pool(net, shape[1:3], padding='VALID', scope='pool')
           # 1 x 1 x 2048
           net = ops.dropout(net, dropout_keep_prob, scope='dropout')
