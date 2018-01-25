@@ -112,6 +112,7 @@ def inception_v3(inputs,
                             stride=1, padding='SAME'):
         # mixed: 35 x 35 x 256.
         with tf.variable_scope('mixed_35x35x256a'):
+          print('SCOPE IS mixed_35x35x256a')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 64, [1, 1])
             print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
@@ -137,125 +138,204 @@ def inception_v3(inputs,
           print('BRANCH mixed_35x35x256a SHAPE: {}'.format(net.get_shape()))
         # mixed_1: 35 x 35 x 288.
         with tf.variable_scope('mixed_35x35x288a'):
+          print('SCOPE IS mixed_35x35x288a')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 64, [1, 1])
+            print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
           with tf.variable_scope('branch5x5'):
             branch5x5 = ops.conv2d(net, 48, [1, 1])
+            print('BRANCH 5x5 SHAPE pt 1: {}'.format(branch5x5.get_shape()))
             branch5x5 = ops.conv2d(branch5x5, 64, [5, 5])
+            print('BRANCH 5x5 SHAPE pt 2: {}'.format(branch5x5.get_shape()))
           with tf.variable_scope('branch3x3dbl'):
             branch3x3dbl = ops.conv2d(net, 64, [1, 1])
+            print('BRANCH 3x3dbl SHAPE pt 1: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = ops.conv2d(branch3x3dbl, 96, [3, 3])
+            print('BRANCH 3x3dbl SHAPE pt 2: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = ops.conv2d(branch3x3dbl, 96, [3, 3])
+            print('BRANCH 3x3dbl SHAPE pt 3: {}'.format(branch3x3dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.avg_pool(net, [3, 3])
+            print('BRANCH POOL SHAPE part 1: {}'.format(branch_pool.get_shape()))
             branch_pool = ops.conv2d(branch_pool, 64, [1, 1])
+            print('BRANCH POOL SHAPE part 2: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch1x1, branch5x5, branch3x3dbl, branch_pool])
           end_points['mixed_35x35x288a'] = net
+          print('BRANCH mixed_35x35x288a SHAPE: {}'.format(net.get_shape()))
         # mixed_2: 35 x 35 x 288.
         with tf.variable_scope('mixed_35x35x288b'):
+          print('SCOPE IS mixed_35x35x288b')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 64, [1, 1])
+            print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
           with tf.variable_scope('branch5x5'):
             branch5x5 = ops.conv2d(net, 48, [1, 1])
+            print('BRANCH 5x5 SHAPE pt 1: {}'.format(branch5x5.get_shape()))
             branch5x5 = ops.conv2d(branch5x5, 64, [5, 5])
+            print('BRANCH 5x5 SHAPE pt 2: {}'.format(branch5x5.get_shape()))
           with tf.variable_scope('branch3x3dbl'):
             branch3x3dbl = ops.conv2d(net, 64, [1, 1])
+            print('BRANCH 3x3dbl SHAPE pt 1: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = ops.conv2d(branch3x3dbl, 96, [3, 3])
+            print('BRANCH 3x3dbl SHAPE pt 2: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = ops.conv2d(branch3x3dbl, 96, [3, 3])
+            print('BRANCH 3x3dbl SHAPE pt 3: {}'.format(branch3x3dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.avg_pool(net, [3, 3])
+            print('BRANCH POOL SHAPE part 1: {}'.format(branch_pool.get_shape()))
             branch_pool = ops.conv2d(branch_pool, 64, [1, 1])
+            print('BRANCH POOL SHAPE part 2: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch1x1, branch5x5, branch3x3dbl, branch_pool])
           end_points['mixed_35x35x288b'] = net
+          print('BRANCH mixed_35x35x288b SHAPE: {}'.format(net.get_shape()))
         # mixed_3: 17 x 17 x 768.
         with tf.variable_scope('mixed_17x17x768a'):
+          print('SCOPE IS mixed_17x17x768a')
           with tf.variable_scope('branch3x3'):
             branch3x3 = ops.conv2d(net, 384, [3, 3], stride=2, padding='VALID')
+            print('BRANCH 3x3 SHAPE: {}'.format(branch3x3.get_shape()))
           with tf.variable_scope('branch3x3dbl'):
             branch3x3dbl = ops.conv2d(net, 64, [1, 1])
+            print('BRANCH 3x3dbl SHAPE pt 1: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = ops.conv2d(branch3x3dbl, 96, [3, 3])
+            print('BRANCH 3x3dbl SHAPE pt 2: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = ops.conv2d(branch3x3dbl, 96, [3, 3],
                                       stride=2, padding='VALID')
+            print('BRANCH 3x3dbl SHAPE pt 3: {}'.format(branch3x3dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.max_pool(net, [3, 3], stride=2, padding='VALID')
+            print('BRANCH POOL SHAPE: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch3x3, branch3x3dbl, branch_pool])
           end_points['mixed_17x17x768a'] = net
+          print('BRANCH mixed_17x17x768a SHAPE: {}'.format(net.get_shape()))
         # mixed4: 17 x 17 x 768.
         with tf.variable_scope('mixed_17x17x768b'):
+          print('SCOPE IS mixed_17x17x768b')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 192, [1, 1])
+            print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
           with tf.variable_scope('branch7x7'):
             branch7x7 = ops.conv2d(net, 128, [1, 1])
+            print('BRANCH 7x7 SHAPE part 1: {}'.format(branch7x7.get_shape()))
             branch7x7 = ops.conv2d(branch7x7, 128, [1, 7])
+            print('BRANCH 7x7 SHAPE part 2: {}'.format(branch7x7.get_shape()))
             branch7x7 = ops.conv2d(branch7x7, 192, [7, 1])
+            print('BRANCH 7x7 SHAPE part 3: {}'.format(branch7x7.get_shape()))
           with tf.variable_scope('branch7x7dbl'):
             branch7x7dbl = ops.conv2d(net, 128, [1, 1])
+            print('BRANCH 7x7dbl SHAPE part 1: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 128, [7, 1])
+            print('BRANCH 7x7dbl SHAPE part 2: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 128, [1, 7])
+            print('BRANCH 7x7dbl SHAPE part 3: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 128, [7, 1])
+            print('BRANCH 7x7dbl SHAPE part 4: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 192, [1, 7])
+            print('BRANCH 7x7dbl SHAPE part 5: {}'.format(branch7x7dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.avg_pool(net, [3, 3])
+            print('BRANCH POOL SHAPE part 1: {}'.format(branch_pool.get_shape()))
             branch_pool = ops.conv2d(branch_pool, 192, [1, 1])
+            print('BRANCH POOL SHAPE part 2: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch1x1, branch7x7, branch7x7dbl, branch_pool])
           end_points['mixed_17x17x768b'] = net
+          print('BRANCH mixed_17x17x768b SHAPE: {}'.format(net.get_shape()))
         # mixed_5: 17 x 17 x 768.
         with tf.variable_scope('mixed_17x17x768c'):
+          print('SCOPE IS mixed_17x17x768c')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 192, [1, 1])
+            print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
           with tf.variable_scope('branch7x7'):
             branch7x7 = ops.conv2d(net, 160, [1, 1])
+            print('BRANCH 7x7 SHAPE part 1: {}'.format(branch7x7.get_shape()))
             branch7x7 = ops.conv2d(branch7x7, 160, [1, 7])
+            print('BRANCH 7x7 SHAPE part 2: {}'.format(branch7x7.get_shape()))
             branch7x7 = ops.conv2d(branch7x7, 192, [7, 1])
+            print('BRANCH 7x7 SHAPE part 3: {}'.format(branch7x7.get_shape()))
           with tf.variable_scope('branch7x7dbl'):
             branch7x7dbl = ops.conv2d(net, 160, [1, 1])
+            print('BRANCH 7x7dbl SHAPE part 1: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 160, [7, 1])
+            print('BRANCH 7x7dbl SHAPE part 2: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 160, [1, 7])
+            print('BRANCH 7x7dbl SHAPE part 3: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 160, [7, 1])
+            print('BRANCH 7x7dbl SHAPE part 4: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 192, [1, 7])
+            print('BRANCH 7x7dbl SHAPE part 5: {}'.format(branch7x7dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.avg_pool(net, [3, 3])
+            print('BRANCH POOL SHAPE part 1: {}'.format(branch_pool.get_shape()))
             branch_pool = ops.conv2d(branch_pool, 192, [1, 1])
+            print('BRANCH POOL SHAPE part 2: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch1x1, branch7x7, branch7x7dbl, branch_pool])
           end_points['mixed_17x17x768c'] = net
+          print('BRANCH mixed_17x17x768c SHAPE: {}'.format(net.get_shape()))
         # mixed_6: 17 x 17 x 768.
         with tf.variable_scope('mixed_17x17x768d'):
+          print('SCOPE IS mixed_17x17x768d')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 192, [1, 1])
+            print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
           with tf.variable_scope('branch7x7'):
             branch7x7 = ops.conv2d(net, 160, [1, 1])
+            print('BRANCH 7x7 SHAPE part 1: {}'.format(branch7x7.get_shape()))
             branch7x7 = ops.conv2d(branch7x7, 160, [1, 7])
+            print('BRANCH 7x7 SHAPE part 2: {}'.format(branch7x7.get_shape()))
             branch7x7 = ops.conv2d(branch7x7, 192, [7, 1])
+            print('BRANCH 7x7 SHAPE part 3: {}'.format(branch7x7.get_shape()))
           with tf.variable_scope('branch7x7dbl'):
             branch7x7dbl = ops.conv2d(net, 160, [1, 1])
+            print('BRANCH 7x7dbl SHAPE part 1: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 160, [7, 1])
+            print('BRANCH 7x7dbl SHAPE part 2: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 160, [1, 7])
+            print('BRANCH 7x7dbl SHAPE part 3: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 160, [7, 1])
+            print('BRANCH 7x7dbl SHAPE part 4: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 192, [1, 7])
+            print('BRANCH 7x7dbl SHAPE part 5: {}'.format(branch7x7dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.avg_pool(net, [3, 3])
+            print('BRANCH POOL SHAPE part 1: {}'.format(branch_pool.get_shape()))
             branch_pool = ops.conv2d(branch_pool, 192, [1, 1])
+            print('BRANCH POOL SHAPE part 2: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch1x1, branch7x7, branch7x7dbl, branch_pool])
           end_points['mixed_17x17x768d'] = net
+          print('BRANCH mixed_17x17x768d SHAPE: {}'.format(net.get_shape()))
         # mixed_7: 17 x 17 x 768.
         with tf.variable_scope('mixed_17x17x768e'):
+          print('SCOPE IS mixed_17x17x768e')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 192, [1, 1])
+            print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
           with tf.variable_scope('branch7x7'):
             branch7x7 = ops.conv2d(net, 192, [1, 1])
+            print('BRANCH 7x7 SHAPE part 1: {}'.format(branch7x7.get_shape()))
             branch7x7 = ops.conv2d(branch7x7, 192, [1, 7])
+            print('BRANCH 7x7 SHAPE part 2: {}'.format(branch7x7.get_shape()))
             branch7x7 = ops.conv2d(branch7x7, 192, [7, 1])
+            print('BRANCH 7x7 SHAPE part 3: {}'.format(branch7x7.get_shape()))
           with tf.variable_scope('branch7x7dbl'):
             branch7x7dbl = ops.conv2d(net, 192, [1, 1])
+            print('BRANCH 7x7dbl SHAPE part 1: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 192, [7, 1])
+            print('BRANCH 7x7dbl SHAPE part 2: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 192, [1, 7])
+            print('BRANCH 7x7dbl SHAPE part 3: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 192, [7, 1])
+            print('BRANCH 7x7dbl SHAPE part 4: {}'.format(branch7x7dbl.get_shape()))
             branch7x7dbl = ops.conv2d(branch7x7dbl, 192, [1, 7])
+            print('BRANCH 7x7dbl SHAPE part 5: {}'.format(branch7x7dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.avg_pool(net, [3, 3])
+            print('BRANCH POOL SHAPE part 1: {}'.format(branch_pool.get_shape()))
             branch_pool = ops.conv2d(branch_pool, 192, [1, 1])
+            print('BRANCH POOL SHAPE part 2: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch1x1, branch7x7, branch7x7dbl, branch_pool])
           end_points['mixed_17x17x768e'] = net
+          print('BRANCH mixed_17x17x768e SHAPE: {}'.format(net.get_shape()))
         # Auxiliary Head logits
         aux_logits = tf.identity(end_points['mixed_17x17x768e'])
         with tf.variable_scope('aux_logits'):
@@ -264,11 +344,11 @@ def inception_v3(inputs,
           aux_logits = ops.conv2d(aux_logits, 128, [1, 1], scope='proj')
           # Shape of feature map before the final layer.
           shape = aux_logits.get_shape()
-          print('SHAPE: {}'.format(shape))
+          print('AUX_LOGITS SHAPE part 1: {}'.format(shape))
           aux_logits = ops.conv2d(aux_logits, 768, shape[1:3], stddev=0.01,
                                   padding='VALID')
           aux_logits = ops.flatten(aux_logits)
-          print('AUX LOGITS: {}'.format(aux_logits))
+          print('AUX LOGITS shape part 2: {}'.format(aux_logits))
           aux_logits = ops.fc(aux_logits, num_classes, activation=None,
                               stddev=0.001, restore=restore_logits)
           end_points['aux_logits'] = aux_logits
@@ -277,56 +357,85 @@ def inception_v3(inputs,
         # checkpoints.
         # (TODO) Fix the scope when appropriate.
         with tf.variable_scope('mixed_17x17x1280a'):
+          print('SCOPE IS mixed_17x17x1280a')
           with tf.variable_scope('branch3x3'):
             branch3x3 = ops.conv2d(net, 192, [1, 1])
+            print('BRANCH 3x3 SHAPE part 1: {}'.format(branch3x3.get_shape()))
             branch3x3 = ops.conv2d(branch3x3, 320, [3, 3], stride=2,
                                    padding='VALID')
+            print('BRANCH 3x3 SHAPE part 1: {}'.format(branch3x3.get_shape()))
           with tf.variable_scope('branch7x7x3'):
             branch7x7x3 = ops.conv2d(net, 192, [1, 1])
+            print('BRANCH 7x3x3 SHAPE part 1: {}'.format(branch7x3x3.get_shape()))
             branch7x7x3 = ops.conv2d(branch7x7x3, 192, [1, 7])
+            print('BRANCH 7x3x3 SHAPE part 2: {}'.format(branch7x3x3.get_shape()))
             branch7x7x3 = ops.conv2d(branch7x7x3, 192, [7, 1])
+            print('BRANCH 7x3x3 SHAPE part 3: {}'.format(branch7x3x3.get_shape()))
             branch7x7x3 = ops.conv2d(branch7x7x3, 192, [3, 3],
                                      stride=2, padding='VALID')
+            print('BRANCH 7x3x3 SHAPE part 4: {}'.format(branch7x3x3.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.max_pool(net, [3, 3], stride=2, padding='VALID')
+            print('BRANCH POOL SHAPE: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch3x3, branch7x7x3, branch_pool])
           end_points['mixed_17x17x1280a'] = net
+          print('BRANCH mixed_17x17x1280a SHAPE: {}'.format(net.get_shape()))
         # mixed_9: 8 x 8 x 2048.
         with tf.variable_scope('mixed_8x8x2048a'):
+          print('SCOPE IS mixed_8x8x2048a')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 320, [1, 1])
+            print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
           with tf.variable_scope('branch3x3'):
             branch3x3 = ops.conv2d(net, 384, [1, 1])
+            print('BRANCH 3x3 SHAPE part 1: {}'.format(branch3x3.get_shape()))
             branch3x3 = tf.concat(axis=3, values=[ops.conv2d(branch3x3, 384, [1, 3]),
                                                   ops.conv2d(branch3x3, 384, [3, 1])])
+            print('BRANCH 3x3 SHAPE part 2: {}'.format(branch3x3.get_shape()))
           with tf.variable_scope('branch3x3dbl'):
             branch3x3dbl = ops.conv2d(net, 448, [1, 1])
+            print('BRANCH 3x3dbl SHAPE pt 1: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = ops.conv2d(branch3x3dbl, 384, [3, 3])
+            print('BRANCH 3x3dbl SHAPE pt 2: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = tf.concat(axis=3, values=[ops.conv2d(branch3x3dbl, 384, [1, 3]),
                                                      ops.conv2d(branch3x3dbl, 384, [3, 1])])
+            print('BRANCH 3x3dbl SHAPE pt 3: {}'.format(branch3x3dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.avg_pool(net, [3, 3])
+            print('BRANCH POOL SHAPE part 1: {}'.format(branch_pool.get_shape()))
             branch_pool = ops.conv2d(branch_pool, 192, [1, 1])
+            print('BRANCH POOL SHAPE part 2: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch1x1, branch3x3, branch3x3dbl, branch_pool])
           end_points['mixed_8x8x2048a'] = net
+          print('BRANCH mixed_8x8x2048a SHAPE: {}'.format(net.get_shape()))
         # mixed_10: 8 x 8 x 2048.
         with tf.variable_scope('mixed_8x8x2048b'):
+          print('SCOPE IS mixed_8x8x2048b')
           with tf.variable_scope('branch1x1'):
             branch1x1 = ops.conv2d(net, 320, [1, 1])
+            print('BRANCH 1x1 SHAPE: {}'.format(branch1x1.get_shape()))
           with tf.variable_scope('branch3x3'):
             branch3x3 = ops.conv2d(net, 384, [1, 1])
+            print('BRANCH 3x3 SHAPE part 1: {}'.format(branch3x3.get_shape()))
             branch3x3 = tf.concat(axis=3, values=[ops.conv2d(branch3x3, 384, [1, 3]),
                                                   ops.conv2d(branch3x3, 384, [3, 1])])
+            print('BRANCH 3x3 SHAPE part 2: {}'.format(branch3x3.get_shape()))
           with tf.variable_scope('branch3x3dbl'):
             branch3x3dbl = ops.conv2d(net, 448, [1, 1])
+            print('BRANCH 3x3dbl SHAPE pt 1: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = ops.conv2d(branch3x3dbl, 384, [3, 3])
+            print('BRANCH 3x3dbl SHAPE pt 2: {}'.format(branch3x3dbl.get_shape()))
             branch3x3dbl = tf.concat(axis=3, values=[ops.conv2d(branch3x3dbl, 384, [1, 3]),
                                                      ops.conv2d(branch3x3dbl, 384, [3, 1])])
+            print('BRANCH 3x3dbl SHAPE pt 3: {}'.format(branch3x3dbl.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.avg_pool(net, [3, 3])
+            print('BRANCH POOL SHAPE part 1: {}'.format(branch_pool.get_shape()))
             branch_pool = ops.conv2d(branch_pool, 192, [1, 1])
+            print('BRANCH POOL SHAPE part 2: {}'.format(branch_pool.get_shape()))
           net = tf.concat(axis=3, values=[branch1x1, branch3x3, branch3x3dbl, branch_pool])
           end_points['mixed_8x8x2048b'] = net
+          print('BRANCH mixed_8x8x2048b SHAPE: {}'.format(net.get_shape()))
         # Final pooling and prediction
         with tf.variable_scope('logits'):
           shape = net.get_shape()
