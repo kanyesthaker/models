@@ -366,14 +366,14 @@ def inception_v3(inputs,
             print('BRANCH 3x3 SHAPE part 1: {}'.format(branch3x3.get_shape()))
           with tf.variable_scope('branch7x7x3'):
             branch7x7x3 = ops.conv2d(net, 192, [1, 1])
-            print('BRANCH 7x3x3 SHAPE part 1: {}'.format(branch7x3x3.get_shape()))
+            print('BRANCH 7x3x3 SHAPE part 1: {}'.format(branch7x7x3.get_shape()))
             branch7x7x3 = ops.conv2d(branch7x7x3, 192, [1, 7])
-            print('BRANCH 7x3x3 SHAPE part 2: {}'.format(branch7x3x3.get_shape()))
+            print('BRANCH 7x3x3 SHAPE part 2: {}'.format(branch7x7x3.get_shape()))
             branch7x7x3 = ops.conv2d(branch7x7x3, 192, [7, 1])
-            print('BRANCH 7x3x3 SHAPE part 3: {}'.format(branch7x3x3.get_shape()))
+            print('BRANCH 7x3x3 SHAPE part 3: {}'.format(branch7x7x3.get_shape()))
             branch7x7x3 = ops.conv2d(branch7x7x3, 192, [3, 3],
                                      stride=2, padding='VALID')
-            print('BRANCH 7x3x3 SHAPE part 4: {}'.format(branch7x3x3.get_shape()))
+            print('BRANCH 7x3x3 SHAPE part 4: {}'.format(branch7x7x3.get_shape()))
           with tf.variable_scope('branch_pool'):
             branch_pool = ops.max_pool(net, [3, 3], stride=2, padding='VALID')
             print('BRANCH POOL SHAPE: {}'.format(branch_pool.get_shape()))
