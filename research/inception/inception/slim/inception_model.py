@@ -91,6 +91,7 @@ def inception_v3(inputs,
         # 147 x 147 x 32
         end_points['conv2'] = ops.conv2d(end_points['conv1'], 64, [3, 3],
                                          padding='SAME', scope='conv2')
+        print('AFTER CONV2 SHAPE: {}'.format(inputs.get_shape()))
         # 147 x 147 x 64
         end_points['pool1'] = ops.max_pool(end_points['conv2'], [3, 3],
                                            stride=2, scope='pool1')
