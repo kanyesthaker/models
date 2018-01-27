@@ -26,6 +26,7 @@ import time
 
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.client import timeline
 
 from inception import image_processing
 from inception import inception_model as inception
@@ -275,8 +276,14 @@ def train(target, dataset, cluster_spec):
       next_summary_time = time.time() + FLAGS.save_summaries_secs
       while not sv.should_stop():
         try:
+          options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+          run_metadata = tf.RunMetadata()
           start_time = time.time()
-          loss_value, step = sess.run([train_op, global_step])
+          loss_value, step = sess.run([train_op, global_step], options=options, run_metadata=run_metadata)
+          fetched_timeline = timeline.Timeline(run_metadata.step_stats)
+          chrome_trace = fetched_timeline.generate_chrome_trace_format()
+          with open('timeline_01.json', 'w') as f:
+            f.write(chrome_trace)
           assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
           if step > FLAGS.max_steps or step > 50:
             break
