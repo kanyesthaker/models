@@ -43,7 +43,7 @@ tf.app.flags.DEFINE_string('protocol', 'grpc',
                            """Communication protocol to use in distributed """
                            """execution (default grpc) """)
 
-tf.app.flags.DEFINE_integer('max_steps', 10, 'Number of batches to run.')
+tf.app.flags.DEFINE_integer('train_steps', 10, 'Number of batches to run.')
 
 # Task ID is used to select the chief and also to access the local_step for
 # each replica to check staleness of the gradients in SyncReplicasOptimizer.
@@ -56,7 +56,7 @@ tf.app.flags.DEFINE_integer('num_replicas_to_aggregate', -1,
                             """Number of gradients to collect before """
                             """updating the parameters.""")
 
-tf.app.flags.DEFINE_string('data_dir', './data', """Data directory""")
+tf.app.flags.DEFINE_string('data_dir', 'wide_deep/data', """Data directory""")
 tf.app.flags.DEFINE_string('model_dir', '/tmp/census_wide_and_deep_model', """directory for storing the model""")
 
 
@@ -233,8 +233,7 @@ def _create_experiment_fn(run_config, hparams=None):  # pylint: disable=unused-a
       estimator=estimator,
       train_input_fn=census_data_source.input_train_fn,
       eval_input_fn=census_data_source.input_test_fn,
-      train_steps=FLAGS.train_steps,
-      eval_steps=FLAGS.eval_steps
+      train_steps=FLAGS.train_steps
   )
 
 def run(target, cluster_spec):
