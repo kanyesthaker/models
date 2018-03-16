@@ -25,8 +25,8 @@ import os
 
 import tensorflow as tf
 
-from tensorflow.contrib.learn.python.learn import learn_runner
-from tensorflow.contrib.learn.python.learn.estimators import run_config
+# from tensorflow.contrib.learn.python.learn import learn_runner
+# from tensorflow.contrib.learn.python.learn.estimators import run_config
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -43,7 +43,7 @@ tf.app.flags.DEFINE_string('protocol', 'grpc',
                            """Communication protocol to use in distributed """
                            """execution (default grpc) """)
 
-tf.app.flags.DEFINE_integer('train_steps', 10, 'Number of batches to run.')
+tf.app.flags.DEFINE_integer('train_steps', 10000, 'Number of batches to run.')
 
 # Task ID is used to select the chief and also to access the local_step for
 # each replica to check staleness of the gradients in SyncReplicasOptimizer.
@@ -222,7 +222,7 @@ def _create_experiment_fn(run_config=None, hparams=None):  # pylint: disable=unu
                                         categorical_columns,
                                         continuous_columns)
 
-  estimator = tf.contrib.learn.DNNLinearCombinedClassifier(
+  estimator = tf.estimator.DNNLinearCombinedClassifier(
       model_dir=FLAGS.model_dir,
       linear_feature_columns=wide_columns,
       dnn_feature_columns=deep_columns,
@@ -235,21 +235,41 @@ def _create_experiment_fn(run_config=None, hparams=None):  # pylint: disable=unu
       train_steps=FLAGS.train_steps
   )
 
-def run(target, cluster_spec):
+def run(target, cluster_spec, cluster_spec_with_chief):
   """Train WD on a dataset for a number of steps."""
-  # machine_type = "chief" if FLAGS.task_id == 0 else "worker"
-  # os.environ["TF_CONFIG"] = json.dumps({
-  #   "cluster": cluster_spec.as_dict(),
-  #   "task": {
-  #       "index": FLAGS.task_id,
-  #       "type": machine_type 
-  #   }
-  # })
+  machine_type = "chief" if FLAGS.task_id == 0 else "worker"
+  os.environ["TF_CONFIG"] = json.dumps({
+    "cluster": cluster_spec_with_chief.as_dict(),
+    "task": {
+        "index": FLAGS.task_id,
+        "type": machine_type
+    }
+  })
   # config = run_config.RunConfig()
-  experiment = _create_experiment_fn()
+  # experiment = _create_experiment_fn()
   # if machine_type == "chief":
   #   experiment.train_and_evaluate()
   # else:
-  experiment.train()
+  # experiment.train()
   # learn_runner.run(experiment_fn=_create_experiment_fn,
                    # run_config=config)
+
+  (columns, label_column, wide_columns, deep_columns, categorical_columns,
+   continuous_columns) = census_model_config()
+
+  census_data_source = CensusDataSource(FLAGS.data_dir,
+                                        columns, label_column,
+                                        categorical_columns,
+                                        continuous_columns)
+
+  estimator = tf.estimator.DNNLinearCombinedClassifier(
+      model_dir=FLAGS.model_dir,
+      linear_feature_columns=wide_columns,
+      dnn_feature_columns=deep_columns,
+      dnn_hidden_units=[100, 75, 50, 25])
+
+
+  train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps)
+  eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
+
+  tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)

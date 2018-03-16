@@ -45,6 +45,7 @@ def main(unused_args):
   #                                      'chief': [chief_worker]})
   # else:
   cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts})
+  cluster_spec_with_chief = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts, 'chief': [chief_worker]})
   
   server = tf.train.Server(
       cluster_spec,
@@ -58,7 +59,7 @@ def main(unused_args):
     # maybe include in schedule???
   else:
     # `worker` jobs will actually do the work.
-    wd_distributed_train.run(server.target, cluster_spec)
+    wd_distributed_train.run(server.target, cluster_spec, cluster_spec_with_chief)
 
 if __name__ == '__main__':
   tf.logging.set_verbosity(tf.logging.INFO)
