@@ -47,8 +47,7 @@ def main(unused_args):
   cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts, 'chief': [chief_worker]})
   
   server = tf.train.Server(
-      {'ps': ps_hosts,
-       'worker': worker_hosts},
+      cluster_spec,
       job_name=FLAGS.job_name,
       task_index=FLAGS.task_id,
       protocol=FLAGS.protocol)
