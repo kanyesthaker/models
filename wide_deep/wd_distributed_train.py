@@ -239,7 +239,7 @@ def _create_experiment_fn(run_config, hparams=None):  # pylint: disable=unused-a
 
 def run(target, cluster_spec):
   """Train WD on a dataset for a number of steps."""
-  machine_type = "worker" if FLAGS.task_id == 0 else "worker"
+  machine_type = "chief" if FLAGS.task_id == 0 else "worker"
   os.environ["TF_CONFIG"] = json.dumps({
     "cluster": cluster_spec.as_dict(),
     "task": {
@@ -249,6 +249,9 @@ def run(target, cluster_spec):
   })
   config = run_config.RunConfig()
   experiment = _create_experiment_fn(config)
-  experiment.train()
+  if machine_type == "chief":
+    experiment.train_and_evaluate()
+  else:
+    experiment.train()
   # learn_runner.run(experiment_fn=_create_experiment_fn,
                    # run_config=config)
