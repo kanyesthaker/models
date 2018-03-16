@@ -26,7 +26,7 @@ import os
 import tensorflow as tf
 
 from tensorflow.contrib.learn.python.learn import learn_runner
-from tensorflow.estimator import run_config
+from tensorflow.python.estimator import run_config
 
 FLAGS = tf.app.flags.FLAGS
 
