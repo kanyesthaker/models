@@ -212,7 +212,7 @@ class CensusDataSource(object):
     return feature_cols, label
 
 
-def _create_experiment_fn(run_config, hparams=None):  # pylint: disable=unused-argument
+def _create_experiment_fn(run_config=None, hparams=None):  # pylint: disable=unused-argument
   """Experiment creation function."""
   (columns, label_column, wide_columns, deep_columns, categorical_columns,
    continuous_columns) = census_model_config()
@@ -226,8 +226,7 @@ def _create_experiment_fn(run_config, hparams=None):  # pylint: disable=unused-a
       model_dir=FLAGS.model_dir,
       linear_feature_columns=wide_columns,
       dnn_feature_columns=deep_columns,
-      dnn_hidden_units=[100, 75, 50, 25],
-      config=run_config)
+      dnn_hidden_units=[100, 75, 50, 25])
 
   return tf.contrib.learn.Experiment(
       estimator=estimator,
@@ -247,10 +246,10 @@ def run(target, cluster_spec):
     }
   })
   config = run_config.RunConfig()
-  experiment = _create_experiment_fn(config)
-  if machine_type == "chief":
-    experiment.train_and_evaluate()
-  else:
-    experiment.train()
+  experiment = _create_experiment_fn()
+  # if machine_type == "chief":
+  #   experiment.train_and_evaluate()
+  # else:
+  experiment.train()
   # learn_runner.run(experiment_fn=_create_experiment_fn,
                    # run_config=config)
