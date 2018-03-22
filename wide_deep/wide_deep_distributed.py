@@ -65,7 +65,7 @@ def main(unused_args):
   #   # maybe include in schedule???
   # else:
   #   # `worker` jobs will actually do the work.
-  wd_distributed_train.run(server.target, cluster_spec)
+  wd_distributed_train.run(None, cluster_spec)
 
 if __name__ == '__main__':
   tf.logging.set_verbosity(tf.logging.INFO)
