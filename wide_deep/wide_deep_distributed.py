@@ -44,8 +44,10 @@ def main(unused_args):
   #   cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts,
   #                                      'chief': [chief_worker]})
   # else:
+
+  worker_hosts_without_chief = worker_hosts[1:]
   cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts})
-  cluster_spec_with_chief = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts, 'chief': [chief_worker]})
+  cluster_spec_with_chief = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts_without_chief, 'chief': [chief_worker]})
   
   server = tf.train.Server(
       cluster_spec,

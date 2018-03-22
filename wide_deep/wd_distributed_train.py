@@ -237,14 +237,6 @@ def _create_experiment_fn(run_config=None, hparams=None):  # pylint: disable=unu
 
 def run(target, cluster_spec, cluster_spec_with_chief):
   """Train WD on a dataset for a number of steps."""
-  machine_type = "chief" if FLAGS.task_id == 0 else "worker"
-  os.environ["TF_CONFIG"] = json.dumps({
-    "cluster": cluster_spec_with_chief.as_dict(),
-    "task": {
-        "index": FLAGS.task_id,
-        "type": machine_type
-    }
-  })
   # config = run_config.RunConfig()
   # experiment = _create_experiment_fn()
   # if machine_type == "chief":
@@ -254,6 +246,15 @@ def run(target, cluster_spec, cluster_spec_with_chief):
   # learn_runner.run(experiment_fn=_create_experiment_fn,
                    # run_config=config)
 
+  machine_type = "chief" if FLAGS.task_id == 0 else "worker"
+  os.environ["TF_CONFIG"] = json.dumps({
+    "cluster": cluster_spec_with_chief.as_dict(),
+    "task": {
+        "index": FLAGS.task_id,
+        "type": machine_type
+    }
+  })
+
   (columns, label_column, wide_columns, deep_columns, categorical_columns,
    continuous_columns) = census_model_config()
 
@@ -261,6 +262,8 @@ def run(target, cluster_spec, cluster_spec_with_chief):
                                         columns, label_column,
                                         categorical_columns,
                                         continuous_columns)
+
+  # config = tf.estimator.RunConfig()
 
   estimator = tf.estimator.DNNLinearCombinedClassifier(
       model_dir=FLAGS.model_dir,
