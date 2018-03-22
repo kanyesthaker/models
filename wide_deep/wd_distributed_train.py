@@ -262,13 +262,14 @@ def run(target, cluster_spec, cluster_spec_with_chief=None):
                                         categorical_columns,
                                         continuous_columns)
 
-  # config = tf.estimator.RunConfig()
+  config = tf.estimator.RunConfig()
 
   estimator = tf.estimator.DNNLinearCombinedClassifier(
       model_dir=FLAGS.model_dir,
       linear_feature_columns=wide_columns,
       dnn_feature_columns=deep_columns,
-      dnn_hidden_units=[100, 75, 50, 25])
+      dnn_hidden_units=[100, 75, 50, 25],
+      config=config)
 
 
   train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps)
