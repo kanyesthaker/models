@@ -235,7 +235,7 @@ def _create_experiment_fn(run_config=None, hparams=None):  # pylint: disable=unu
       train_steps=FLAGS.train_steps
   )
 
-def run(target, cluster_spec, cluster_spec_with_chief):
+def run(target, cluster_spec, cluster_spec_with_chief=None):
   """Train WD on a dataset for a number of steps."""
   # config = run_config.RunConfig()
   # experiment = _create_experiment_fn()
@@ -246,12 +246,11 @@ def run(target, cluster_spec, cluster_spec_with_chief):
   # learn_runner.run(experiment_fn=_create_experiment_fn,
                    # run_config=config)
 
-  machine_type = "chief" if FLAGS.task_id == 0 else "worker"
   os.environ["TF_CONFIG"] = json.dumps({
-    "cluster": cluster_spec_with_chief.as_dict(),
+    "cluster": cluster_spec.as_dict(),
     "task": {
         "index": FLAGS.task_id,
-        "type": machine_type
+        "type": FLAGS.job_name
     }
   })
 
