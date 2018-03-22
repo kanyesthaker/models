@@ -53,19 +53,19 @@ def main(unused_args):
   
   cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts, 'chief': [chief_worker]})
 
-  server = tf.train.Server(
-      cluster_spec,
-      job_name=FLAGS.job_name,
-      task_index=FLAGS.task_id,
-      protocol=FLAGS.protocol)
+  # server = tf.train.Server(
+  #     cluster_spec,
+  #     job_name=FLAGS.job_name,
+  #     task_index=FLAGS.task_id,
+  #     protocol=FLAGS.protocol)
 
-  if FLAGS.job_name == 'ps':
-    # `ps` jobs wait for incoming connections from the workers.
-    server.join()
-    # maybe include in schedule???
-  else:
-    # `worker` jobs will actually do the work.
-    wd_distributed_train.run(server.target, cluster_spec)
+  # if FLAGS.job_name == 'ps':
+  #   # `ps` jobs wait for incoming connections from the workers.
+  #   server.join()
+  #   # maybe include in schedule???
+  # else:
+  #   # `worker` jobs will actually do the work.
+  wd_distributed_train.run(server.target, cluster_spec)
 
 if __name__ == '__main__':
   tf.logging.set_verbosity(tf.logging.INFO)
