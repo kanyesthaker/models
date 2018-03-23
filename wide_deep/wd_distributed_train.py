@@ -262,10 +262,9 @@ def run(target, cluster_spec, cluster_spec_with_chief=None):
                                         categorical_columns,
                                         continuous_columns)
 
-  config = tf.estimator.RunConfig(save_checkpoints_steps=1, keep_checkpoint_max=10)
+  config = tf.estimator.RunConfig(save_checkpoints_steps=None, save_checkpoints_secs=None)
 
   estimator = tf.estimator.DNNLinearCombinedClassifier(
-      model_dir=FLAGS.model_dir,
       linear_feature_columns=wide_columns,
       dnn_feature_columns=deep_columns,
       dnn_hidden_units=[100, 75, 50, 25],
