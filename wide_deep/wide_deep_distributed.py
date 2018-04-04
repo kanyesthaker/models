@@ -40,8 +40,12 @@ def main(unused_args):
 
   chief_worker = worker_hosts[0]
   worker_hosts = worker_hosts[1:]
-  
-  cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts, 'chief': [chief_worker]})
+
+  if len(worker_hosts) > 0:
+    cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts, 'chief': [chief_worker]})
+  else:
+    cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'chief': [chief_worker]})
+    
   wd_distributed_train.run(cluster_spec)
 
 if __name__ == '__main__':
