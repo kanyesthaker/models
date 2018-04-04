@@ -38,34 +38,11 @@ def main(unused_args):
   tf.logging.info('Worker hosts are: %s' % worker_hosts[1:])
   tf.logging.info('Chief host is: %s' % worker_hosts[0])
 
-  # worker_list_copy = list(worker_hosts)
   chief_worker = worker_hosts[0]
   worker_hosts = worker_hosts[1:]
-
-  # if len(worker_list_copy) == 0:
-  #   cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts,
-  #                                      'chief': [chief_worker]})
-  # else:
-
-  # worker_hosts_without_chief = worker_hosts[1:]
-  # cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts})
-  # cluster_spec_with_chief = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts_without_chief, 'chief': [chief_worker]})
   
   cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'worker': worker_hosts, 'chief': [chief_worker]})
-
-  # server = tf.train.Server(
-  #     cluster_spec,
-  #     job_name=FLAGS.job_name,
-  #     task_index=FLAGS.task_id,
-  #     protocol=FLAGS.protocol)
-
-  # if FLAGS.job_name == 'ps':
-  #   # `ps` jobs wait for incoming connections from the workers.
-  #   server.join()
-  #   # maybe include in schedule???
-  # else:
-  #   # `worker` jobs will actually do the work.
-  wd_distributed_train.run(None, cluster_spec)
+  wd_distributed_train.run(cluster_spec)
 
 if __name__ == '__main__':
   tf.logging.set_verbosity(tf.logging.INFO)

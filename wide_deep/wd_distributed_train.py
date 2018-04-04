@@ -211,40 +211,8 @@ class CensusDataSource(object):
     # Returns the feature columns and the label.
     return feature_cols, label
 
-
-def _create_experiment_fn(run_config=None, hparams=None):  # pylint: disable=unused-argument
-  """Experiment creation function."""
-  (columns, label_column, wide_columns, deep_columns, categorical_columns,
-   continuous_columns) = census_model_config()
-
-  census_data_source = CensusDataSource(FLAGS.data_dir,
-                                        columns, label_column,
-                                        categorical_columns,
-                                        continuous_columns)
-
-  estimator = tf.estimator.DNNLinearCombinedClassifier(
-      model_dir=FLAGS.model_dir,
-      linear_feature_columns=wide_columns,
-      dnn_feature_columns=deep_columns,
-      dnn_hidden_units=[100, 75, 50, 25])
-
-  return tf.contrib.learn.Experiment(
-      estimator=estimator,
-      train_input_fn=census_data_source.input_train_fn,
-      eval_input_fn=census_data_source.input_test_fn,
-      train_steps=FLAGS.train_steps
-  )
-
-def run(target, cluster_spec, cluster_spec_with_chief=None):
+def run(cluster_spec):
   """Train WD on a dataset for a number of steps."""
-  # config = run_config.RunConfig()
-  # experiment = _create_experiment_fn()
-  # if machine_type == "chief":
-  #   experiment.train_and_evaluate()
-  # else:
-  # experiment.train()
-  # learn_runner.run(experiment_fn=_create_experiment_fn,
-                   # run_config=config)
 
   os.environ["TF_CONFIG"] = json.dumps({
     "cluster": cluster_spec.as_dict(),
