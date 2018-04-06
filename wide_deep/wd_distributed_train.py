@@ -235,7 +235,7 @@ def run(cluster_spec):
       dnn_hidden_units=[100, 75, 50, 25],
       config=config)
 
-  timeline_hook = tf.train.ProfilerHook(save_steps=1, show_dataflow=True, show_memory=False)
+  timeline_hook = tf.train.ProfilerHook(save_steps=1500, show_dataflow=True, show_memory=False)
 
   train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps, hooks=[timeline_hook])
   eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
