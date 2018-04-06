@@ -24,10 +24,6 @@ import json
 import os
 
 import tensorflow as tf
-from tensorflow.python.client import timeline
-
-# from tensorflow.contrib.learn.python.learn import learn_runner
-# from tensorflow.contrib.learn.python.learn.estimators import run_config
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -239,13 +235,9 @@ def run(cluster_spec):
       dnn_hidden_units=[100, 75, 50, 25],
       config=config)
 
+  timeline_hook = tf.train.ProfilerHook(save_steps=1, show_dataflow=True, show_memory=True)
 
-  train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps)
+  train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps, hooks=[timeline_hook])
   eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
 
   tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
-  run_metadata = tf.RunMetadata()
-  fetched_timeline = timeline.Timeline(run_metadata.step_stats)
-  chrome_trace = fetched_timeline.generate_chrome_trace_format()
-  with open('timeline_01.json', 'w') as f:
-    f.write(chrome_trace)
