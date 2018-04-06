@@ -24,6 +24,7 @@ import json
 import os
 
 import tensorflow as tf
+from tensorflow.python.client import timeline
 
 # from tensorflow.contrib.learn.python.learn import learn_runner
 # from tensorflow.contrib.learn.python.learn.estimators import run_config
@@ -243,3 +244,8 @@ def run(cluster_spec):
   eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
 
   tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
+  run_metadata = tf.RunMetadata()
+  fetched_timeline = timeline.Timeline(run_metadata.step_stats)
+  chrome_trace = fetched_timeline.generate_chrome_trace_format()
+  with open('timeline_01.json', 'w') as f:
+    f.write(chrome_trace)
