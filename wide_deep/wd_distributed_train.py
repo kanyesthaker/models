@@ -227,7 +227,7 @@ def run(cluster_spec):
                                         categorical_columns,
                                         continuous_columns)
 
-  config = tf.estimator.RunConfig(save_checkpoints_steps=None, save_checkpoints_secs=None, log_step_count_steps=1, save_summary_steps=1)
+  config = tf.estimator.RunConfig(save_checkpoints_steps=None, save_checkpoints_secs=None, log_step_count_steps=400, save_summary_steps=400)
 
   estimator = tf.estimator.DNNLinearCombinedClassifier(
       linear_feature_columns=wide_columns,
