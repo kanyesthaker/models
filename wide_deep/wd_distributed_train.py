@@ -241,4 +241,4 @@ def run(cluster_spec):
   # eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
   # tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
   estimator.train(input_fn=census_data_source.input_train_fn, hooks=[timeline_hook], max_steps=FLAGS.train_steps)
-  # estimator.evaluate(input_fn=census_data_source.input_train_fn, hooks=[timeline_hook], max_steps=FLAGS.train_steps)
+  estimator.evaluate(input_fn=census_data_source.input_test_fn)
