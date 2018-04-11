@@ -227,7 +227,7 @@ def run(cluster_spec):
                                         categorical_columns,
                                         continuous_columns)
 
-  config = tf.estimator.RunConfig(save_checkpoints_steps=None, save_checkpoints_secs=None, log_step_count_steps=400, save_summary_steps=400)
+  config = tf.estimator.RunConfig(save_checkpoints_steps=None, save_checkpoints_secs=None, log_step_count_steps=1, save_summary_steps=1)
 
   estimator = tf.estimator.DNNLinearCombinedClassifier(
       linear_feature_columns=wide_columns,
@@ -239,8 +239,6 @@ def run(cluster_spec):
 
   train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps, hooks=[timeline_hook])
   eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
-  print('AHHHHHHHHH')
-  print(estimator._config)
   tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
   # estimator.train(input_fn=census_data_source.input_train_fn, hooks=[timeline_hook], max_steps=FLAGS.train_steps)
   # estimator.evaluate(input_fn=census_data_source.input_test_fn)
