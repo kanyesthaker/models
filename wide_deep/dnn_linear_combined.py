@@ -51,6 +51,7 @@ class CombinedOptimizer(tf.train.Optimizer):
   def __init__(self, linear_feature_columns):
     self.dnn_optimizer = optimizers.get_optimizer_instance('Adagrad', learning_rate=_DNN_LEARNING_RATE)
     self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
+    self._name = 'combined'
 
   def minimize(self, loss, global_step):
     train_ops = []
