@@ -67,7 +67,7 @@ class CombinedOptimizer(tf.train.Optimizer):
     dnn_ops = self.dnn_optimizer.apply_gradients(dnn_pairs)
     linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
     train_ops = [dnn_ops, linear_ops]
-    
+
     train_op = control_flow_ops.group(*train_ops)
     return train_op
 
@@ -132,9 +132,9 @@ def _dnn_linear_combined_model_fn(
 
     pairs = sync_optimizer.compute_gradients(loss)
     print(pairs)
-    train_ops = sync_optimizer.apply_gradients(pairs, global_step)
+    train_op = sync_optimizer.apply_gradients(pairs, global_step)
 
-    train_op = control_flow_ops.group(*train_ops)
+    # train_op = control_flow_ops.group(*train_ops)
     with ops.control_dependencies([train_op]):
       with ops.colocate_with(global_step):
         return state_ops.assign_add(global_step, 1)
