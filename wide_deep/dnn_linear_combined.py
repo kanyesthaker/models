@@ -141,8 +141,7 @@ class DNNLinearCombinedClassifier(estimator.Estimator):
                weight_column=None,
                label_vocabulary=None,
                input_layer_partitioner=None,
-               config=None
-               )
+               config=None):
 
     linear_feature_columns = linear_feature_columns or []
     dnn_feature_columns = dnn_feature_columns or []
