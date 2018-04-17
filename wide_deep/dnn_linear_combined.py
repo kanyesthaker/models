@@ -12,7 +12,6 @@
 # # See the License for the specific language governing permissions and
 # # limitations under the License.
 # # ==============================================================================
-import tensorflow as tf
 
 """TensorFlow estimators for Linear and DNN joined training models."""
 
@@ -24,6 +23,7 @@ import math
 
 import six
 
+import tensorflow as tf
 from tensorflow.python.estimator import estimator
 from tensorflow.python.estimator.canned import dnn
 from tensorflow.python.estimator.canned import head as head_lib
