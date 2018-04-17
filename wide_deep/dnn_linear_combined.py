@@ -85,7 +85,7 @@ def _dnn_linear_combined_model_fn(
 
   dnn_parent_scope = 'dnn'
   linear_parent_scope = 'linear'
-  
+
   dnn_partitioner = (
       partitioned_variables.min_max_variable_partitioner(
           max_partitions=num_ps_replicas))
@@ -116,6 +116,7 @@ def _dnn_linear_combined_model_fn(
 
   def _train_op_fn(loss):
     """Returns the op to optimize the loss."""
+    global_step = training_util.get_global_step()
     train_ops = sync_optimizer.minimize(loss)
 
     train_op = control_flow_ops.group(*train_ops)
