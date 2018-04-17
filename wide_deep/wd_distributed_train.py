@@ -212,9 +212,6 @@ class CensusDataSource(object):
 
 def run(cluster_spec):
   """Train WD on a dataset for a number of steps."""
-  print('TESTING IMPORT')
-  dnn_linear_combined.yo()
-  print('DONE TESTING IMPORT')
 
   os.environ["TF_CONFIG"] = json.dumps({
     "cluster": cluster_spec.as_dict(),
@@ -234,7 +231,13 @@ def run(cluster_spec):
 
   config = tf.estimator.RunConfig(save_checkpoints_steps=None, save_checkpoints_secs=None, log_step_count_steps=1, save_summary_steps=1)
 
-  estimator = tf.estimator.DNNLinearCombinedClassifier(
+  # estimator = tf.estimator.DNNLinearCombinedClassifier(
+  #     linear_feature_columns=wide_columns,
+  #     dnn_feature_columns=deep_columns,
+  #     dnn_hidden_units=[100, 75, 50, 25],
+  #     config=config)
+
+  estimator = dnn_linear_combined.DNNLinearCombinedClassifier(
       linear_feature_columns=wide_columns,
       dnn_feature_columns=deep_columns,
       dnn_hidden_units=[100, 75, 50, 25],
