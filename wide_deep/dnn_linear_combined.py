@@ -69,7 +69,7 @@ class CombinedOptimizer(tf.train.Optimizer):
     linear_ops = self.linear_optimizer.apply_gradients(linear_pairs, global_step=global_step)
     # train_ops.append(dnn_pairs)
     # train_ops.append(linear_pairs)
-    return tf.group(dnn_ops, linear_ops)
+    return tf.group([dnn_ops, linear_ops])
 
 ########################################################################
 
