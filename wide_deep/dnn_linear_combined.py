@@ -66,7 +66,10 @@ class CombinedOptimizer(tf.train.Optimizer):
 
     dnn_ops = self.dnn_optimizer.apply_gradients(dnn_pairs)
     linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
-    return [dnn_ops, linear_ops]
+    train_ops = [dnn_ops, linear_ops]
+    
+    train_op = control_flow_ops.group(*train_ops)
+    return train_op
 
 ########################################################################
 
