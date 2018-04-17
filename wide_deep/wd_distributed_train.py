@@ -210,7 +210,7 @@ class CensusDataSource(object):
     # Returns the feature columns and the label.
     return feature_cols, label
 
-def run(cluster_spec):
+def run(cluster_spec, num_workers):
   """Train WD on a dataset for a number of steps."""
 
   os.environ["TF_CONFIG"] = json.dumps({
@@ -241,7 +241,8 @@ def run(cluster_spec):
       linear_feature_columns=wide_columns,
       dnn_feature_columns=deep_columns,
       dnn_hidden_units=[100, 75, 50, 25],
-      config=config)
+      config=config,
+      num_workers=num_workers)
 
   timeline_hook = tf.train.ProfilerHook(save_steps=1500, show_dataflow=True, show_memory=False)
 

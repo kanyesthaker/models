@@ -52,7 +52,7 @@ class CombinedOptimizer(tf.train.Optimizer):
     self.dnn_optimizer = optimizers.get_optimizer_instance('Adagrad', learning_rate=_DNN_LEARNING_RATE)
     self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
 
-  def minimize(self, loss, ):
+  def minimize(self, loss):
     train_ops = []
     dnn_ops = self.dnn_optimizer.minimize(loss,var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
     linear_ops = self.linear_optimizer.minimize(loss,var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
@@ -62,7 +62,7 @@ class CombinedOptimizer(tf.train.Optimizer):
 ########################################################################
 
 def _dnn_linear_combined_model_fn(
-    features, labels, mode, head,
+    features, labels, mode, head, num_workers,
     linear_feature_columns=None,
     dnn_feature_columns=None, dnn_hidden_units=None,
     dnn_activation_fn=nn.relu, dnn_dropout=None,
@@ -81,7 +81,7 @@ def _dnn_linear_combined_model_fn(
           min_slice_size=64 << 20))
 
   combined_optimizer = CombinedOptimizer(linear_feature_columns)
-  sync_optimizer = tf.train.SyncReplicasOptimizer(combined_optimizer)
+  sync_optimizer = tf.train.SyncReplicasOptimizer(combined_optimizer, replicas_to_aggregate=num_workers, total_num_replicas=num_workers)
 
   dnn_partitioner = (
       partitioned_variables.min_max_variable_partitioner(
@@ -130,6 +130,7 @@ def _dnn_linear_combined_model_fn(
 
 class DNNLinearCombinedClassifier(estimator.Estimator):
   def __init__(self,
+               num_workers,
                model_dir=None,
                linear_feature_columns=None,
                dnn_feature_columns=None,
@@ -140,7 +141,8 @@ class DNNLinearCombinedClassifier(estimator.Estimator):
                weight_column=None,
                label_vocabulary=None,
                input_layer_partitioner=None,
-               config=None):
+               config=None
+               )
 
     linear_feature_columns = linear_feature_columns or []
     dnn_feature_columns = dnn_feature_columns or []
@@ -170,7 +172,8 @@ class DNNLinearCombinedClassifier(estimator.Estimator):
           dnn_activation_fn=dnn_activation_fn,
           dnn_dropout=dnn_dropout,
           input_layer_partitioner=input_layer_partitioner,
-          config=config)
+          config=config,
+          num_workers=num_workers)
 
     super(DNNLinearCombinedClassifier, self).__init__(
         model_fn=_model_fn, model_dir=model_dir, config=config)

@@ -46,7 +46,7 @@ def main(unused_args):
   else:
     cluster_spec = tf.train.ClusterSpec({'ps': ps_hosts, 'chief': [chief_worker]})
     
-  wd_distributed_train.run(cluster_spec)
+  wd_distributed_train.run(cluster_spec, len(worker_hosts) + 1)
 
 if __name__ == '__main__':
   tf.logging.set_verbosity(tf.logging.INFO)
