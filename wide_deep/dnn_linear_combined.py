@@ -64,8 +64,8 @@ class CombinedOptimizer(tf.train.Optimizer):
   def apply_gradients(self, grads_and_vars, global_step):
     dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
 
-    dnn_ops = self.dnn_optimizer.apply_gradients(dnn_pairs)
-    linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
+    dnn_ops = self.dnn_optimizer.apply_gradients(dnn_pairs, global_step=global_step)
+    linear_ops = self.linear_optimizer.apply_gradients(linear_pairs, global_step=global_step)
     train_ops = [dnn_ops, linear_ops]
 
     train_op = control_flow_ops.group(*train_ops)
@@ -80,12 +80,6 @@ def _dnn_linear_combined_model_fn(
     dnn_activation_fn=nn.relu, dnn_dropout=None,
     input_layer_partitioner=None, config=None):
 
-  if not isinstance(features, dict):
-    raise ValueError('features should be a dictionary of `Tensor`s. '
-                     'Given type: {}'.format(type(features)))
-  if not linear_feature_columns and not dnn_feature_columns:
-    raise ValueError(
-        'Either linear_feature_columns or dnn_feature_columns must be defined.')
   num_ps_replicas = config.num_ps_replicas if config else 0
   input_layer_partitioner = input_layer_partitioner or (
       partitioned_variables.min_max_variable_partitioner(
@@ -131,7 +125,6 @@ def _dnn_linear_combined_model_fn(
     global_step = training_util.get_global_step()
 
     pairs = sync_optimizer.compute_gradients(loss)
-    print(pairs)
     train_op = sync_optimizer.apply_gradients(pairs, global_step)
 
     # train_op = control_flow_ops.group(*train_ops)
