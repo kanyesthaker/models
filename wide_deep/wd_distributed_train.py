@@ -25,6 +25,8 @@ import os
 
 import tensorflow as tf
 
+from wide_deep import dnn_linear_combined
+
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string('job_name', '', 'One of "ps", "worker"')
@@ -210,6 +212,9 @@ class CensusDataSource(object):
 
 def run(cluster_spec):
   """Train WD on a dataset for a number of steps."""
+  print('TESTING IMPORT')
+  dnn_linear_combined.yo()
+  print('DONE TESTING IMPORT')
 
   os.environ["TF_CONFIG"] = json.dumps({
     "cluster": cluster_spec.as_dict(),
@@ -240,5 +245,3 @@ def run(cluster_spec):
   train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps, hooks=[timeline_hook])
   eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
   tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
-  # estimator.train(input_fn=census_data_source.input_train_fn, hooks=[timeline_hook], max_steps=FLAGS.train_steps)
-  # estimator.evaluate(input_fn=census_data_source.input_test_fn)

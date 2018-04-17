@@ -3,6 +3,16 @@ py_library(
     srcs = [
         "wd_distributed_train.py",
     ],
+    deps = [
+        ":dnn_linear_combined",
+    ]
+)
+
+py_library(
+    name = "dnn_linear_combined",
+    srcs = [
+        "dnn_linear_combined.py"
+    ],
 )
 
 py_binary(
