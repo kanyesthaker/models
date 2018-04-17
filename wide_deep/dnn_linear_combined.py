@@ -129,6 +129,7 @@ def _dnn_linear_combined_model_fn(
     global_step = training_util.get_global_step()
 
     pairs = sync_optimizer.compute_gradients(loss)
+    print(pairs)
     train_ops = sync_optimizer.apply_gradients(pairs, global_step)
 
     train_op = control_flow_ops.group(*train_ops)
