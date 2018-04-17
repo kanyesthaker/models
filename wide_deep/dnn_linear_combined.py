@@ -42,6 +42,7 @@ from tensorflow.python.training import training_util
 # implementation.
 _DNN_LEARNING_RATE = 0.001
 _LINEAR_LEARNING_RATE = 0.005
+DNN_PAIRS_NUM = 18
 
 def _linear_learning_rate(num_linear_feature_columns):
   default_learning_rate = 1. / math.sqrt(num_linear_feature_columns)
@@ -54,12 +55,12 @@ class CombinedOptimizer(tf.train.Optimizer):
     self._name = 'combined'
 
   def compute_gradients(self, loss):
-    dnn_pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
-    linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
-    return dnn_pairs, linear_pairs
+    pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
+    pairs.append(self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear')))
+    return pairs
   
   def apply_gradients(self, grads_and_vars, global_step):
-    dnn_pairs, linear_pairs = grads_and_vars
+    dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
     train_ops = []
 
     dnn_ops = self.dnn_optimizer.apply_gradients(dnn_pairs, global_step=global_step)
@@ -127,9 +128,8 @@ def _dnn_linear_combined_model_fn(
     """Returns the op to optimize the loss."""
     global_step = training_util.get_global_step()
 
-    dnn_pairs, linear_pairs = sync_optimizer.compute_gradients(loss)
-    print('LEN DNN PAIRS {}'.format(len(dnn_pairs)))
-    train_ops = sync_optimizer.apply_gradients(var_pairs, global_step)
+    pairs = sync_optimizer.compute_gradients(loss)
+    train_ops = sync_optimizer.apply_gradients(pairs, global_step)
 
     train_op = control_flow_ops.group(*train_ops)
     with ops.control_dependencies([train_op]):
