@@ -127,7 +127,8 @@ def _dnn_linear_combined_model_fn(
     """Returns the op to optimize the loss."""
     global_step = training_util.get_global_step()
 
-    var_pairs = sync_optimizer.compute_gradients(loss)
+    dnn_pairs, linear_pairs = sync_optimizer.compute_gradients(loss)
+    print('LEN DNN PAIRS {}'.format(len(dnn_pairs)))
     train_ops = sync_optimizer.apply_gradients(var_pairs, global_step)
 
     train_op = control_flow_ops.group(*train_ops)
