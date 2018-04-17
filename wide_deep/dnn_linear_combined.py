@@ -83,6 +83,9 @@ def _dnn_linear_combined_model_fn(
   combined_optimizer = CombinedOptimizer(linear_feature_columns)
   sync_optimizer = tf.train.SyncReplicasOptimizer(combined_optimizer, replicas_to_aggregate=num_workers, total_num_replicas=num_workers)
 
+  dnn_parent_scope = 'dnn'
+  linear_parent_scope = 'linear'
+  
   dnn_partitioner = (
       partitioned_variables.min_max_variable_partitioner(
           max_partitions=num_ps_replicas))
