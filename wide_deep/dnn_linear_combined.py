@@ -63,13 +63,10 @@ class CombinedOptimizer(tf.train.Optimizer):
   
   def apply_gradients(self, grads_and_vars, global_step):
     dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
-    # train_ops = []
 
     dnn_ops = self.dnn_optimizer.apply_gradients(dnn_pairs)
     linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
-    # train_ops.append(dnn_pairs)
-    # train_ops.append(linear_pairs)
-    return tf.group([dnn_ops, linear_ops])
+    return [dnn_ops, linear_ops]
 
 ########################################################################
 
