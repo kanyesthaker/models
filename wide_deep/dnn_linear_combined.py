@@ -14,10 +14,6 @@
 # # ==============================================================================
 import tensorflow as tf
 
-class CombinedOptimizer(tf.train.Optimizer):
-  def __init__(self):
-    print('yo')
-
 """TensorFlow estimators for Linear and DNN joined training models."""
 
 from __future__ import absolute_import
@@ -48,6 +44,10 @@ from tensorflow.python.training import training_util
 _DNN_LEARNING_RATE = 0.001
 _LINEAR_LEARNING_RATE = 0.005
 
+
+class CombinedOptimizer(tf.train.Optimizer):
+  def __init__(self):
+    print('yo')
 
 def _check_no_sync_replicas_optimizer(optimizer):
   if isinstance(optimizer, sync_replicas_optimizer.SyncReplicasOptimizer):
@@ -239,4 +239,3 @@ class DNNLinearCombinedClassifier(estimator.Estimator):
     super(DNNLinearCombinedClassifier, self).__init__(
         model_fn=_model_fn, model_dir=model_dir, config=config)
 
-    
