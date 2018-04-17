@@ -52,13 +52,15 @@ class CombinedOptimizer(tf.train.Optimizer):
     self.dnn_optimizer = optimizers.get_optimizer_instance('Adagrad', learning_rate=_DNN_LEARNING_RATE)
     self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
 
-  def minimize(self, loss):
+  def minimize(self, loss, global_step):
     train_ops = []
-    dnn_ops = self.dnn_optimizer.minimize(loss,var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
-    linear_ops = self.linear_optimizer.minimize(loss,var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
+    dnn_ops = self.dnn_optimizer.minimize(loss, global_step=global_step, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
+    linear_ops = self.linear_optimizer.minimize(loss, global_step=global_step, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
     train_ops.append(dnn_ops)
     train_ops.append(linear_ops)
     return train_ops
+
+  # def compute_gradients()
 ########################################################################
 
 def _dnn_linear_combined_model_fn(
@@ -117,7 +119,7 @@ def _dnn_linear_combined_model_fn(
   def _train_op_fn(loss):
     """Returns the op to optimize the loss."""
     global_step = training_util.get_global_step()
-    train_ops = sync_optimizer.minimize(loss)
+    train_ops = sync_optimizer.minimize(loss, global_step=global_step)
 
     train_op = control_flow_ops.group(*train_ops)
     with ops.control_dependencies([train_op]):
