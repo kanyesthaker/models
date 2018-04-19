@@ -51,24 +51,24 @@ def _linear_learning_rate(num_linear_feature_columns):
 class CombinedOptimizer(tf.train.Optimizer):
   def __init__(self, linear_feature_columns):
     self.dnn_optimizer = optimizers.get_optimizer_instance('Adagrad', learning_rate=_DNN_LEARNING_RATE)
-    self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
+    # self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
     self._name = 'combined'
 
   def compute_gradients(self, loss):
     pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
-    linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
-    for x in linear_pairs:
-      pairs.append(x)
+    # linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
+    # for x in linear_pairs:
+      # pairs.append(x)
     return pairs
   
   def apply_gradients(self, grads_and_vars, global_step):
-    dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
+    # dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
 
-    dnn_ops = self.dnn_optimizer.apply_gradients(dnn_pairs)
-    linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
-    train_ops = [dnn_ops, linear_ops]
+    train_op = self.dnn_optimizer.apply_gradients(grads_and_vars)
+    # linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
+    # train_ops = [dnn_ops, linear_ops]
 
-    train_op = control_flow_ops.group(*train_ops)
+    # train_op = control_flow_ops.group(*train_ops)
     return train_op
 
 ########################################################################
@@ -109,17 +109,17 @@ def _dnn_linear_combined_model_fn(
         input_layer_partitioner=input_layer_partitioner)
     dnn_logits = dnn_logit_fn(features=features, mode=mode)
 
-  with variable_scope.variable_scope(
-      linear_parent_scope,
-      values=tuple(six.itervalues(features)),
-      partitioner=input_layer_partitioner) as scope:
-    logit_fn = linear._linear_logit_fn_builder(
-        units=head.logits_dimension,
-        feature_columns=linear_feature_columns)
-    linear_logits = logit_fn(features=features)
+  # with variable_scope.variable_scope(
+  #     linear_parent_scope,
+  #     values=tuple(six.itervalues(features)),
+  #     partitioner=input_layer_partitioner) as scope:
+  #   logit_fn = linear._linear_logit_fn_builder(
+  #       units=head.logits_dimension,
+  #       feature_columns=linear_feature_columns)
+  #   linear_logits = logit_fn(features=features)
 
-  logits = dnn_logits + linear_logits
-  
+  logits = dnn_logits #+ linear_logits
+
 
   def _train_op_fn(loss):
     """Returns the op to optimize the loss."""
