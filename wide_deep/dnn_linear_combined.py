@@ -72,16 +72,24 @@ class CombinedOptimizer(tf.train.Optimizer):
   #   return train_op
 
   def _create_slots(self, var_list):
-    return self.dnn_optimizer._create_slots(var_list)
+    x = self.dnn_optimizer._create_slots(var_list)
+    print(x)
+    return x
 
   def _prepare(self):
-    return self.dnn_optimizer._prepare()
+    x = self.dnn_optimizer._prepare()
+    print(x)
+    return x
 
   def _apply_dense(self, grad, var):
-    return self.dnn_optimizer._apply_dense(grad, var)
+    x = self.dnn_optimizer._apply_dense(grad, var)
+    print(x)
+    return x
 
   def _apply_sparse(self, grad, var):
-    return self.dnn_optimizer._apply_sparse(grad, var)
+    x = self.dnn_optimizer._apply_sparse(grad, var)
+    print(x)
+    return x
 
 ########################################################################
 
