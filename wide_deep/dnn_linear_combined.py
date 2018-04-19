@@ -173,7 +173,7 @@ class DNNLinearCombinedClassifier(estimator.Estimator):
           weight_column=weight_column,
           label_vocabulary=label_vocabulary)
 
-    self.optimizer = self.create_optimizer(num_workers)
+    self.optimizer = self.create_optimizer(num_workers, linear_feature_columns)
 
     def _model_fn(features, labels, mode, config):
       return _dnn_linear_combined_model_fn(
