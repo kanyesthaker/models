@@ -54,22 +54,34 @@ class CombinedOptimizer(tf.train.Optimizer):
     # self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
     self._name = 'combined'
 
-  def compute_gradients(self, loss):
-    pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
-    # linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
-    # for x in linear_pairs:
-      # pairs.append(x)
-    return pairs
+  # def compute_gradients(self, loss):
+  #   pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
+  #   # linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
+  #   # for x in linear_pairs:
+  #     # pairs.append(x)
+  #   return pairs
   
-  def apply_gradients(self, grads_and_vars, global_step):
-    # dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
+  # def apply_gradients(self, grads_and_vars, global_step):
+  #   # dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
 
-    train_op = self.dnn_optimizer.apply_gradients(grads_and_vars)
-    # linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
-    # train_ops = [dnn_ops, linear_ops]
+  #   train_op = self.dnn_optimizer.apply_gradients(grads_and_vars)
+  #   # linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
+  #   # train_ops = [dnn_ops, linear_ops]
 
-    # train_op = control_flow_ops.group(*train_ops)
-    return train_op
+  #   # train_op = control_flow_ops.group(*train_ops)
+  #   return train_op
+
+  def _create_slots(self, var_list):
+    return self.dnn_optimizer._create_slots(var_list)
+
+  def _prepare(self):
+    return self.dnn_optimizer._prepare()
+
+  def _apply_dense(self, grad, var):
+    return self.dnn_optimizer._apply_dense(grad, var)
+
+  def _apply_sparse(self, grad, var):
+    return self.dnn_optimizer._apply_sparse(grad, var)
 
 ########################################################################
 
