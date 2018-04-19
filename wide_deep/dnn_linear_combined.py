@@ -194,8 +194,8 @@ class DNNLinearCombinedClassifier(estimator.Estimator):
     super(DNNLinearCombinedClassifier, self).__init__(
         model_fn=_model_fn, model_dir=model_dir, config=config)
 
-  def create_optimizer(self, num_workers):
-    opt = CombinedOptimizer()
+  def create_optimizer(self, num_workers, linear_feature_columns=None):
+    opt = CombinedOptimizer(linear_feature_columns)
     return tf.train.SyncReplicasOptimizer(opt, replicas_to_aggregate=num_workers, total_num_replicas=num_workers)
 
   def get_optimizer(self):
