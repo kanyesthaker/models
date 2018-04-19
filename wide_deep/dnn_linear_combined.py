@@ -95,6 +95,18 @@ class CombinedOptimizer(tf.train.Optimizer):
     print(x)
     return x
 
+  def _resource_apply_dense(self, grad, var):
+    x = self.dnn_optimizer._resource_apply_dense(grad, var)
+    print("RESOURCE APPLY DENSE BRUHHHH")
+    print(x)
+    return x
+
+  def _resource_apply_sparse(self, grad, var):
+    x = self.dnn_optimizer._resource_apply_sparse(grad, var)
+    print("RESOURCE APPLY SPARSE BRUHhhhhhhhhhhhhhh")
+    print(x)
+    return x
+
 ########################################################################
 
 def _dnn_linear_combined_model_fn(
