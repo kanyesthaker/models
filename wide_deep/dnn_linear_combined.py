@@ -119,6 +119,7 @@ def _dnn_linear_combined_model_fn(
     linear_logits = logit_fn(features=features)
 
   logits = dnn_logits + linear_logits
+  
 
   def _train_op_fn(loss):
     """Returns the op to optimize the loss."""
