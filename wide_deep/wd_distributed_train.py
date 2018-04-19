@@ -244,8 +244,11 @@ def run(cluster_spec, num_workers):
       config=config,
       num_workers=num_workers)
 
-  timeline_hook = tf.train.ProfilerHook(save_steps=1500, show_dataflow=True, show_memory=False)
+  opt = estimator.get_optimizer()
 
-  train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps, hooks=[timeline_hook])
+  timeline_hook = tf.train.ProfilerHook(save_steps=1500, show_dataflow=True, show_memory=False)
+  sync_replicas_hook = opt.make_session_run_hook(FLAGS.job_name == "chief")
+
+  train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps, hooks=[timeline_hook, sync_replicas_hook])
   eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
   tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)

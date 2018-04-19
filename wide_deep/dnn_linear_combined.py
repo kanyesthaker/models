@@ -49,68 +49,32 @@ def _linear_learning_rate(num_linear_feature_columns):
   return min(_LINEAR_LEARNING_RATE, default_learning_rate)
 
 class CombinedOptimizer(tf.train.Optimizer):
-  def __init__(self, linear_feature_columns):
+  def __init__(self, linear_feature_columns=None):
     self.dnn_optimizer = optimizers.get_optimizer_instance('Adagrad', learning_rate=_DNN_LEARNING_RATE)
     # self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
     self._name = 'combined'
 
-  # def compute_gradients(self, loss):
-  #   pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
-  #   # linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
-  #   # for x in linear_pairs:
-  #     # pairs.append(x)
-  #   return pairs
+  def compute_gradients(self, loss):
+    pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
+    # linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
+    # for x in linear_pairs:
+      # pairs.append(x)
+    return pairs
   
-  # def apply_gradients(self, grads_and_vars, global_step):
-  #   # dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
+  def apply_gradients(self, grads_and_vars, global_step):
+    # dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
 
-  #   train_op = self.dnn_optimizer.apply_gradients(grads_and_vars)
-  #   # linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
-  #   # train_ops = [dnn_ops, linear_ops]
+    train_op = self.dnn_optimizer.apply_gradients(grads_and_vars)
+    # linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
+    # train_ops = [dnn_ops, linear_ops]
 
-  #   # train_op = control_flow_ops.group(*train_ops)
-  #   return train_op
-
-  def _create_slots(self, var_list):
-    x = self.dnn_optimizer._create_slots(var_list)
-    print("CREATE SLOTS")
-    print(x)
-    return x
-
-  def _prepare(self):
-    x = self.dnn_optimizer._prepare()
-    print("PREPARE")
-    print(x)
-    return x
-
-  def _apply_dense(self, grad, var):
-    x = self.dnn_optimizer._apply_dense(grad, var)
-    print("apply dense BRUHHHHHH")
-    print(x)
-    return x
-
-  def _apply_sparse(self, grad, var):
-    x = self.dnn_optimizer._apply_sparse(grad, var)
-    print("APPLY SPARSE BRUH")
-    print(x)
-    return x
-
-  def _resource_apply_dense(self, grad, var):
-    x = self.dnn_optimizer._resource_apply_dense(grad, var)
-    print("RESOURCE APPLY DENSE BRUHHHH")
-    print(x)
-    return x
-
-  def _resource_apply_sparse(self, grad, var):
-    x = self.dnn_optimizer._resource_apply_sparse(grad, var)
-    print("RESOURCE APPLY SPARSE BRUHhhhhhhhhhhhhhh")
-    print(x)
-    return x
+    # train_op = control_flow_ops.group(*train_ops)
+    return train_op
 
 ########################################################################
 
 def _dnn_linear_combined_model_fn(
-    features, labels, mode, head, num_workers,
+    features, labels, mode, head, num_workers, opt,
     linear_feature_columns=None,
     dnn_feature_columns=None, dnn_hidden_units=None,
     dnn_activation_fn=nn.relu, dnn_dropout=None,
@@ -122,8 +86,8 @@ def _dnn_linear_combined_model_fn(
           max_partitions=num_ps_replicas,
           min_slice_size=64 << 20))
 
-  combined_optimizer = CombinedOptimizer(linear_feature_columns)
-  sync_optimizer = tf.train.SyncReplicasOptimizer(combined_optimizer, replicas_to_aggregate=num_workers, total_num_replicas=num_workers)
+  # combined_optimizer = CombinedOptimizer(linear_feature_columns)
+  # sync_optimizer = tf.train.SyncReplicasOptimizer(combined_optimizer, replicas_to_aggregate=num_workers, total_num_replicas=num_workers)
 
   dnn_parent_scope = 'dnn'
   linear_parent_scope = 'linear'
@@ -161,8 +125,8 @@ def _dnn_linear_combined_model_fn(
     """Returns the op to optimize the loss."""
     global_step = training_util.get_global_step()
 
-    pairs = sync_optimizer.compute_gradients(loss)
-    train_op = sync_optimizer.apply_gradients(pairs, global_step)
+    pairs = opt.compute_gradients(loss)
+    train_op = opt.apply_gradients(pairs, global_step)
 
     # train_op = control_flow_ops.group(*train_ops)
     with ops.control_dependencies([train_op]):
@@ -208,6 +172,9 @@ class DNNLinearCombinedClassifier(estimator.Estimator):
           n_classes,
           weight_column=weight_column,
           label_vocabulary=label_vocabulary)
+
+    self.optimizer = self.create_optimizer(num_workers)
+
     def _model_fn(features, labels, mode, config):
       return _dnn_linear_combined_model_fn(
           features=features,
@@ -221,8 +188,16 @@ class DNNLinearCombinedClassifier(estimator.Estimator):
           dnn_dropout=dnn_dropout,
           input_layer_partitioner=input_layer_partitioner,
           config=config,
-          num_workers=num_workers)
+          num_workers=num_workers,
+          opt=self.optimizer)
 
     super(DNNLinearCombinedClassifier, self).__init__(
         model_fn=_model_fn, model_dir=model_dir, config=config)
+
+  def create_optimizer(self, num_workers):
+    opt = CombinedOptimizer()
+    return tf.train.SyncReplicasOptimizer(opt, replicas_to_aggregate=num_workers, total_num_replicas=num_workers)
+
+  def get_optimizer(self):
+    return self.optimizer
 
