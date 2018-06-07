@@ -23,7 +23,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 
-from wide_deep import wd_distributed_train
+import wd_distributed_train
 
 FLAGS = tf.app.flags.FLAGS
 

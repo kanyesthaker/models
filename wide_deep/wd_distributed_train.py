@@ -25,7 +25,7 @@ import os
 
 import tensorflow as tf
 
-from wide_deep import dnn_linear_combined
+import dnn_linear_combined
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -247,7 +247,7 @@ def run(cluster_spec, num_workers):
   opt = estimator.get_optimizer()
 
   timeline_hook = tf.train.ProfilerHook(save_steps=1500, show_dataflow=True, show_memory=False)
-  sync_replicas_hook = opt.make_session_run_hook(FLAGS.job_name == "chief")
+  sync_replicas_hook = opt.make_session_run_hook(FLAGS.job_name == "chief", num_tokens =0)
 
   train_spec = tf.estimator.TrainSpec(input_fn=census_data_source.input_train_fn, max_steps=FLAGS.train_steps, hooks=[timeline_hook, sync_replicas_hook])
   eval_spec = tf.estimator.EvalSpec(input_fn=census_data_source.input_test_fn)
