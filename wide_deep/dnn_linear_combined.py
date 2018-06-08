@@ -56,9 +56,8 @@ class CombinedOptimizer(tf.train.Optimizer):
 
   def compute_gradients(self, loss):
     pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
-    linear_pairs = self.linear_optimizer(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
-    for x in linear_pairs:
-      pairs.append(x)
+    linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
+    pairs.extend(linear_pairs)
     return pairs
   
   def apply_gradients(self, grads_and_vars, global_step):
