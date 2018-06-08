@@ -51,24 +51,25 @@ def _linear_learning_rate(num_linear_feature_columns):
 class CombinedOptimizer(tf.train.Optimizer):
   def __init__(self, linear_feature_columns=None):
     self.dnn_optimizer = optimizers.get_optimizer_instance('Adagrad', learning_rate=_DNN_LEARNING_RATE)
-    self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
+    # self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate=_linear_learning_rate(len(linear_feature_columns)))
+    self.linear_optimizer = optimizers.get_optimizer_instance('Ftrl', learning_rate = _LINEAR_LEARNING_RATE)
     self._name = 'combined'
 
   def compute_gradients(self, loss):
     pairs = self.dnn_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='dnn'))
     linear_pairs = self.linear_optimizer.compute_gradients(loss, var_list=ops.get_collection(ops.GraphKeys.TRAINABLE_VARIABLES, scope='linear'))
     pairs.extend(linear_pairs)
+    # for pair in linear_pairs:
+    #   pairs.append(pair)
     return pairs
   
   def apply_gradients(self, grads_and_vars, global_step):
     dnn_pairs, linear_pairs = grads_and_vars[:DNN_PAIRS_NUM], grads_and_vars[DNN_PAIRS_NUM:]
+    dnn_ops, linear_ops = self.dnn_optimizer.apply_gradients(dnn_pairs), self.linear_optimizer.apply_gradients(linear_pairs)
 
-    dnn_ops = self.dnn_optimizer.apply_gradients(grads_and_vars)
-    linear_ops = self.linear_optimizer.apply_gradients(linear_pairs)
     train_ops = [dnn_ops, linear_ops]
 
-    train_op = control_flow_ops.group(*train_ops)
-    return train_op
+    return control_flow_ops.group(*train_ops)
 
 ########################################################################
 
